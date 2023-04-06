@@ -1,11 +1,10 @@
 Adapter-Prompt
 ==============================
 
-Combining LLMs with adapters 
+Using adapters along with smaller LMs to perform better prompt tuning
 
 
-
-<p align="center">
+<!-- <p align="center">
 <img src=""  />
 </p>
 
@@ -60,7 +59,7 @@ Project Organization
 └── tests
     └── test_environment.py
 ```
---------
+-------- -->
 
 
 ## Getting Started
@@ -68,10 +67,10 @@ Project Organization
 ### Requirements
 
 ```
-pip install -r requirements.txt
+poetry install
 ```
 
-### Download the dataset
+<!-- ### Download the dataset
 
 The following command will download the dataset from the URL given in `src/config/config.py` file .
 
@@ -105,4 +104,4 @@ python -m tests.test_environment
 - [ ] Test model
 - [ ] Main Pipeline
 
--------------------------------
+------------------------------- -->
