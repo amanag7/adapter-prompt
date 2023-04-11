@@ -9,6 +9,7 @@ import pickle as pkl
 import numpy as np
 from copy import deepcopy
 import os
+import gc ## For garbage collect
 from glob import glob
 import logging
 import pathlib
@@ -19,6 +20,7 @@ from multiprocessing import Pool
 import sys
 import time
 import quadprog
+from gpuutils import GpuUtils
 import io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="UTF-8")
 logger = logging.getLogger(__name__)
@@ -514,8 +516,10 @@ def remove_id(idx, need_process, all_pasts):
         all_pasts[layer_id][idx] = 0
 
 
-def sample_sequence(model, need_process, qa_results, all_pasts, max_tot_lens):
+def sample_sequence(model, need_process, qa_results, all_pasts, max_tot_lens,test_run):
     while len(need_process) > 0:
+        df = GpuUtils.analyzeSystem() 
+        device_ids_util = df[df["utilizations"] < 15]["gpu_index"].tolist()
         first_id = next(iter(need_process))
         shortest_len = len(qa_results[first_id])
         decode_batch_size = int(args.memory_sizes[0] * MEMORY_FACTOR[args.seq_train_type] // (shortest_len+1)**LEN_FACTOR)
@@ -532,6 +536,7 @@ def sample_sequence(model, need_process, qa_results, all_pasts, max_tot_lens):
                         break
                     batch_ids.append(cur_id)
                     if args.model_name == "gpt2":
+#                         import pdb;pdb.set_trace();
                         input_ids.append(qa_results[cur_id][-1:])
                         for layer_id in range(MODEL_CONFIG.n_layer):
                             past[layer_id].append(all_pasts[layer_id][cur_id])
@@ -546,11 +551,12 @@ def sample_sequence(model, need_process, qa_results, all_pasts, max_tot_lens):
             n_inputs = len(input_ids)
             if n_inputs == 0:
                 break
+#             import pdb;pdb.set_trace();
             input_ids = torch.stack(input_ids)
             if args.model_name == "gpt2":
                 for layer_id in range(MODEL_CONFIG.n_layer):
                     past[layer_id] = torch.stack(past[layer_id], dim=1)
-                all_outputs = model(input_ids=input_ids.cuda(), past=past)
+                all_outputs = model(input_ids=input_ids.cuda(), past_key_values=past)
             else:
                 all_outputs = model(input_ids=input_ids.cuda())
 
@@ -559,9 +565,14 @@ def sample_sequence(model, need_process, qa_results, all_pasts, max_tot_lens):
                 pasts = all_outputs[1]
 
             next_logits = outputs[..., -1, :] / args.temperature_qa
-            next_tokens = logits_to_tokens(next_logits).cpu()
+            next_tokens = logits_to_tokens(next_logits,test_run).cpu()
+#             import pdb;pdb.set_trace();
+            print(f"The generated tokens are {' '.join([TOKENIZER.decode(each_token) for each_token in next_tokens])}")
 
             for i, cur_id in enumerate(batch_ids):
+#                 logger.info(f"Final Layer id before addition for cur id {cur_id} Shape is {all_pasts[layer_id][cur_id].shape}")
+                gc.collect()
+                torch.cuda.empty_cache()
                 if next_tokens[i] == SPECIAL_TOKEN_IDS["eos_token"]:
                     remove_ids.append(cur_id)
                 else:
@@ -570,7 +581,10 @@ def sample_sequence(model, need_process, qa_results, all_pasts, max_tot_lens):
                         remove_ids.append(cur_id)
                     elif args.model_name == "gpt2":
                         for layer_id in range(MODEL_CONFIG.n_layer):
-                            all_pasts[layer_id][cur_id] = pasts[layer_id][:, i].type(torch.float if args.fp32 else torch.half)
+#                             all_pasts[layer_id][cur_id] = torch.stack(pasts[layer_id]).squeeze(1).type(torch.float if args.fp32 else torch.half).to(device_ids_util[0])
+                            all_pasts[layer_id][cur_id] = torch.stack([each_key_value[i] for each_key_value in pasts[layer_id]]).type(torch.float if args.fp32 else torch.half)
+#                     logger.info(f"Final Layer id after addition for cur id {cur_id} Shape is {all_pasts[layer_id][cur_id].shape}")
+
         for idx in remove_ids:
             remove_id(idx, need_process, all_pasts)
 
@@ -631,7 +645,7 @@ def read_extra_data(gen_path, train_extra_data):
             train_extra_data.append(row)
 
 
-def create_extra_data(task, prev_task, model, train_extra_data):
+def create_extra_data(task, prev_task, model, train_extra_data, test_run):
     if args.real_sample:
         logger.info(f"using real data as extra data")
         return get_real_data(task, train_extra_data)
@@ -664,8 +678,8 @@ def create_extra_data(task, prev_task, model, train_extra_data):
     for i in range(gen_size):
         need_process.update([[i, None]])
         if len(need_process) > int(args.memory_sizes[0] * 0.12):
-            sample_sequence(model, need_process, qa_results, all_pasts, max_tot_lens)
-    sample_sequence(model, need_process, qa_results, all_pasts, max_tot_lens)
+            sample_sequence(model, need_process, qa_results, all_pasts, max_tot_lens,test_run)
+    sample_sequence(model, need_process, qa_results, all_pasts, max_tot_lens,test_run)
 
     model.train()
 
@@ -676,10 +690,12 @@ def create_extra_data(task, prev_task, model, train_extra_data):
     write_extra_data(gen_path, qa_results)
 
 
-def logits_to_tokens(next_logits):
+def logits_to_tokens(next_logits,test_run):
     filtered_logits = top_k_top_p_filtering(next_logits, top_k=args.top_k_qa, top_p=args.top_p_qa)
     log_probs = F.softmax(filtered_logits, dim=-1)
     next_tokens = torch.multinomial(log_probs, num_samples=1)
+    if test_run:
+        next_tokens = torch.argmax(log_probs, dim=-1).unsqueeze(-1)  #### [new] Added to fix the constraint output
     return next_tokens
 
  

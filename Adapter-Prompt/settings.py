@@ -6,8 +6,8 @@ import datetime
 logger = logging.getLogger(__name__)
 
 import GPUtil
-from pytorch_transformers import OpenAIGPTLMHeadModel, OpenAIGPTTokenizer, OpenAIGPTConfig
-from pytorch_transformers import GPT2LMHeadModel, GPT2Tokenizer, GPT2Config, CONFIG_NAME 
+from transformers import OpenAIGPTLMHeadModel, OpenAIGPTTokenizer, OpenAIGPTConfig
+from transformers import GPT2LMHeadModel, GPT2Tokenizer, GPT2Config, CONFIG_NAME 
 import torch
 
 
@@ -35,7 +35,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--adam_epsilon", default=1e-4, type=float)
     parser.add_argument("--add_task_tokens", action="store_true")
-    parser.add_argument("--data_dir", type=str, default="../../data")
+    parser.add_argument("--data_dir", type=str, required=True)
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--decay_style", type=str, default="linear")
     parser.add_argument("--fp32", action="store_true")
@@ -50,7 +50,7 @@ def parse_args():
     parser.add_argument("--max_n_epochs", type=int, default=9)
     parser.add_argument("--min_batch_size", type=int, default=4)
     parser.add_argument("--min_n_steps", type=int, default=1500)
-    parser.add_argument("--model_dir_root", type=str, default="../../models")
+    parser.add_argument("--model_dir_root", type=str, required=True)
     parser.add_argument("--model_name", type=str, default="gpt2", choices=["gpt2", "openai-gpt"])
     parser.add_argument("--n_gpus", type=int, default=1)
     parser.add_argument("--n_train_epochs", type=int, default=3)
@@ -85,7 +85,7 @@ def parse_args():
             args.seq_train_type, "{}_{}".format("_".join(args.tasks),
                 args.gen_lm_sample_percentage) if "lll" in args.seq_train_type else "_".join(args.tasks))
 
-    args.device_ids = GPUtil.getAvailable(maxLoad=0.05, maxMemory=0.05, limit=args.n_gpus)
+    args.device_ids = GPUtil.getAvailable(maxLoad=0.15, maxMemory=0.15, limit=args.n_gpus)
     if len(args.device_ids) == 0:
         logger.error('No available GPUs!')
         raise NotImplementedError("No CPU mode available!")
