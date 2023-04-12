@@ -20,6 +20,8 @@ bitsandbytes = "^0.37.2"
 loguru = "^0.6.0"
 gputil = "^1.4.0"
 pytorch-transformers = "^1.2.0"
+quadprog = "^0.1.11"
+gpuutils = "^0.0.2"
 
 
 [build-system]

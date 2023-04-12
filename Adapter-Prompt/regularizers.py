@@ -2,8 +2,8 @@ import abc
 import math
 import torch
 from torch.optim import Optimizer, SGD
-from settings import args, FILL_VAL, TOKENS_WEIGHT
-from utils import get_losses, get_model_dir
+from utils.settings import args, FILL_VAL, TOKENS_WEIGHT
+from utils.utils import get_losses, get_model_dir
 from parallel import DataParallelCriterion
 from torch.nn import CrossEntropyLoss, MSELoss
 import pickle as pkl

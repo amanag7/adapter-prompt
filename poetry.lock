@@ -760,6 +760,21 @@ files = [
 ]
 
 [[package]]
+name = "gpuutils"
+version = "0.0.2"
+description = "Gpu Utils: Simple Tool for GPU Analysis and Allocation"
+category = "main"
+optional = false
+python-versions = ">=3.5.5"
+files = [
+    {file = "gpuutils-0.0.2-py3-none-any.whl", hash = "sha256:0c59202fc5cbf72511b80997db70b4592442b83dad94d65d621ff76ad0efbff3"},
+    {file = "gpuutils-0.0.2.tar.gz", hash = "sha256:a7703eed72e144355d275ce098b31f1b39da490f3d4724b2bf48a83a6e6b7ce6"},
+]
+
+[package.dependencies]
+pandas = ">=0.23.4"
+
+[[package]]
 name = "greenlet"
 version = "2.0.2"
 description = "Lightweight in-process concurrent programming"
@@ -1770,6 +1785,35 @@ files = [
 ]
 
 [[package]]
+name = "quadprog"
+version = "0.1.11"
+description = "Quadratic Programming Solver"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "quadprog-0.1.11-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:9ce86f314b413d0cbe0cdaa0a9d3efb7602a261c0fdaba1a122f5bb60ea83407"},
+    {file = "quadprog-0.1.11-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:9def860b382200f3d0c7c6e723921cc1aa99245f671edc55beed468cc5e0ee03"},
+    {file = "quadprog-0.1.11-cp310-cp310-win_amd64.whl", hash = "sha256:66ae0bf0b00eac3ba239d49f2907753f9edd2e8bf96ff605f88a64a2f0f5035d"},
+    {file = "quadprog-0.1.11-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:9525e92589bb58f63ff8e89493834167f3e5f3c692b9f5e2d050e7d4fbf4b835"},
+    {file = "quadprog-0.1.11-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:89cd434520823e333ce4de792e2b0b8dec1b5cce9a65bfa1afb30e960469f506"},
+    {file = "quadprog-0.1.11-cp36-cp36m-win_amd64.whl", hash = "sha256:8976c9447639a2b0e55d0a2d653172b515797a2598256a4dceed51d26469cc2a"},
+    {file = "quadprog-0.1.11-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:314b2e2954c5cd6415ce269cd31cb52976ac20f9e6af6517f4b0c81561b483e7"},
+    {file = "quadprog-0.1.11-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:fd333de5b50444487e4426f1b6522bc9495709836debd2105885d9ae8456479b"},
+    {file = "quadprog-0.1.11-cp37-cp37m-win_amd64.whl", hash = "sha256:1954bf66d1f8768ad31ef6a7240c99f6b229c9b4c2d79225339eb256a9e1ea3e"},
+    {file = "quadprog-0.1.11-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:923020347807d61a8c84280b1d119ee51e17a32f26dace4ab8da51238224948e"},
+    {file = "quadprog-0.1.11-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:73f09858fb0344b8fb7e050be47e9d0e6cad518a2ac34c80d8eb1f01c5efadfc"},
+    {file = "quadprog-0.1.11-cp38-cp38-win_amd64.whl", hash = "sha256:e94497f319f309e86acf73632171f490aaf1a92bd8c05358634eff0ef0d960e2"},
+    {file = "quadprog-0.1.11-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:58eed7bcb1f4d0e20ecdf69d6c703ff5dc2b136733806b04f3a1778030b749fe"},
+    {file = "quadprog-0.1.11-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c44bfe84afd64ff629515e0eb1601e0895d0f1f12663ec57a2eea8e463f44ae2"},
+    {file = "quadprog-0.1.11-cp39-cp39-win_amd64.whl", hash = "sha256:ebd2d5759585f5f1079839ba06306434f132e308f231b014a833b17aaa6b7e44"},
+    {file = "quadprog-0.1.11.tar.gz", hash = "sha256:8e320f9f7f1466141e317e61736e8108720e6adbae53f9d6960f726efef788d9"},
+]
+
+[package.dependencies]
+numpy = "*"
+
+[[package]]
 name = "regex"
 version = "2023.3.23"
 description = "Alternative regular expression module, to replace re."
@@ -2739,4 +2783,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "3.8"
-content-hash = "eb7cb5082510e154b71dccb7e3153b0ee8298c3123327db98f1aa4759bb8b542"
+content-hash = "c80aa77b3c401cca1c67f0d027f2137551b93d4c19c6fd651b03f15de71a3dbe"
